@@ -1,0 +1,30 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32414.318
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DancingGoatCore", "DancingGoatCore\DancingGoatCore.csproj", "{AC630190-1D22-419D-A986-752E65D60A3D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kentico.Xperience.AmazonPersonalize", "Kentico.Xperience.AmazonPersonalize\Kentico.Xperience.AmazonPersonalize.csproj", "{57EFA9A1-A4BB-4BA8-A781-5E637D7D9749}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AC630190-1D22-419D-A986-752E65D60A3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC630190-1D22-419D-A986-752E65D60A3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC630190-1D22-419D-A986-752E65D60A3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC630190-1D22-419D-A986-752E65D60A3D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57EFA9A1-A4BB-4BA8-A781-5E637D7D9749}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57EFA9A1-A4BB-4BA8-A781-5E637D7D9749}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57EFA9A1-A4BB-4BA8-A781-5E637D7D9749}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57EFA9A1-A4BB-4BA8-A781-5E637D7D9749}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D59A02F0-F8F7-4080-8AFA-E1B2DEDB12BF}
+	EndGlobalSection
+EndGlobal

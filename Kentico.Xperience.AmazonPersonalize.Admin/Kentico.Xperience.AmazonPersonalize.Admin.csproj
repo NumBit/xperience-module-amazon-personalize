@@ -1,0 +1,55 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AWSSDK.Core" Version="3.5.2.10" />
+    <PackageReference Include="AWSSDK.Personalize" Version="3.3.106.4" />
+    <PackageReference Include="AWSSDK.PersonalizeEvents" Version="3.5.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  </ItemGroup>
+
+
+	<ItemGroup>
+		<Compile Include="..\CMS\CMSModules\Kentico.Xperience.AmazonPersonalize.Admin\AmazonPersonalize_setup.aspx.cs" Link="Pages\AmazonPersonalize_setup.aspx.cs" />
+		<Compile Include="..\CMS\CMSModules\Kentico.Xperience.AmazonPersonalize.Admin\AmazonPersonalize_setup.aspx.designer.cs" Link="Pages\AmazonPersonalize_setup.aspx.designer.cs" />
+	</ItemGroup>
+
+	
+
+	<ItemGroup>
+		<Reference Include="CMS.Base">
+			<HintPath>..\Lib\CMS.Base.dll</HintPath>
+		</Reference>
+		<Reference Include="CMS.Base.Web.UI">
+			<HintPath>..\Lib\CMS.Base.Web.UI.dll</HintPath>
+		</Reference>
+		<Reference Include="CMS.Core">
+			<HintPath>..\Lib\CMS.Core.dll</HintPath>
+		</Reference>
+		<Reference Include="CMS.DataEngine">
+			<HintPath>..\Lib\CMS.DataEngine.dll</HintPath>
+		</Reference>
+		<Reference Include="CMS.DocumentEngine">
+			<HintPath>..\Lib\CMS.DocumentEngine.dll</HintPath>
+		</Reference>
+		<Reference Include="CMS.Membership">
+			<HintPath>..\Lib\CMS.Membership.dll</HintPath>
+		</Reference>
+		<Reference Include="CMS.UIControls">
+			<HintPath>..\Lib\CMS.UIControls.dll</HintPath>
+		</Reference>
+		<Reference Include="System.Web" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="Pages\" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\CMS\CMSModules\Kentico.Xperience.AmazonPersonalize.Admin\AmazonPersonalize_setup.aspx" Link="Pages\AmazonPersonalize_setup.aspx" />
+	</ItemGroup>
+	
+</Project>

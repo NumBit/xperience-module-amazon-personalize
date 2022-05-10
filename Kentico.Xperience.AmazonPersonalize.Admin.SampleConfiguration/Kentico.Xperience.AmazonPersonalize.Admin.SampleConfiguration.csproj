@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Kentico.Xperience.AmazonPersonalize.Admin\Kentico.Xperience.AmazonPersonalize.Admin.csproj" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<Reference Include="CMS.Base">
+			<HintPath>..\Lib\CMS.Base.dll</HintPath>
+		</Reference>
+		<Reference Include="CMS.Core">
+			<HintPath>..\Lib\CMS.Core.dll</HintPath>
+		</Reference>
+		<Reference Include="CMS.DataEngine">
+			<HintPath>..\Lib\CMS.DataEngine.dll</HintPath>
+		</Reference>
+		<Reference Include="CMS.DocumentEngine">
+			<HintPath>..\Lib\CMS.DocumentEngine.dll</HintPath>
+		</Reference>
+	</ItemGroup>
+	
+</Project>

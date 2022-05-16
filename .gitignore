@@ -354,3 +354,6 @@ healthchecksdb
 *.cfs
 segments_2i
 
+#Include created nugets
+!Kentico.Xperience.AmazonPersonalize.KX13.*.nupkg
+!Kentico.Xperience.AmazonPersonalize.Admin.KX13.*.nupkg

@@ -13,31 +13,13 @@ public partial class CMSModules_AmazonPersonalize_setup
 {
 
     /// <summary>
-    /// btnIntDbStructure control.
-    /// </summary>
-    /// <remarks>
-    /// Auto-generated field.
-    /// To modify move field declaration from designer file to code-behind file.
-    /// </remarks>
-    protected global::CMS.Base.Web.UI.LocalizedButton btnIntDbStructure;
-
-    /// <summary>
     /// btnResetDatabase control.
     /// </summary>
     /// <remarks>
     /// Auto-generated field.
     /// To modify move field declaration from designer file to code-behind file.
     /// </remarks>
-    protected global::CMS.Base.Web.UI.LocalizedButton btnResetDatabase;
-
-    /// <summary>
-    /// btnResetDatabase control.
-    /// </summary>
-    /// <remarks>
-    /// Auto-generated field.
-    /// To modify move field declaration from designer file to code-behind file.
-    /// </remarks>
-    protected global::CMS.Base.Web.UI.LocalizedButton btnPopulateDatabase;
+    protected global::CMS.Base.Web.UI.LocalizedButton btnPopulateDataset;
 
     /// <summary>
     /// pageTypesWrapper control.

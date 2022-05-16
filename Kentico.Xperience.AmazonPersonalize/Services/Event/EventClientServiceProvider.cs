@@ -8,12 +8,12 @@ using CMS.Core;
 namespace Kentico.Xperience.AmazonPersonalize
 {
     /// <summary>
-    /// Provider of site-specific <see cref="IDatasetClientService"/>.
+    /// Provider of site-specific <see cref="IEventClientService"/>.
     /// </summary>
     public class EventClientServiceProvider : IEventClientServiceProvider
     {
         private readonly IServiceConfigurationProvider configurationProvider;
-        //private readonly IEventTrackerServiceProvider eventTrackerServiceProvider;
+        private readonly IEventTrackerServiceProvider eventTrackerServiceProvider;
         private readonly IEventLogService eventLogService;
 
 
@@ -26,10 +26,11 @@ namespace Kentico.Xperience.AmazonPersonalize
         /// </summary>
         /// <param name="configurationProvider">Provider of the Amazon Personalize service configuration.</param>
         /// <param name="eventLogService">Event log service.</param>
-        public EventClientServiceProvider(IServiceConfigurationProvider configurationProvider, IEventLogService eventLogService)
+        public EventClientServiceProvider(IServiceConfigurationProvider configurationProvider, IEventLogService eventLogService, IEventTrackerServiceProvider eventTrackerServiceProvider)
         {
             this.configurationProvider = configurationProvider ?? throw new ArgumentNullException(nameof(configurationProvider));
             this.eventLogService = eventLogService ?? throw new ArgumentNullException(nameof(eventLogService));
+            this.eventTrackerServiceProvider = eventTrackerServiceProvider ?? throw new ArgumentNullException(nameof(eventTrackerServiceProvider));
         }
 
 
@@ -66,18 +67,22 @@ namespace Kentico.Xperience.AmazonPersonalize
 
                 var accessKey = configurationProvider.GetAcessKey(siteName);
                 var secretKey = configurationProvider.GetSecretKey(siteName);
-                if (String.IsNullOrEmpty(accessKey) || String.IsNullOrEmpty(secretKey))
+                var regionEndpointName = configurationProvider.GetRegionEndpoint(siteName);
+                if (String.IsNullOrEmpty(accessKey) || String.IsNullOrEmpty(secretKey) || regionEndpointName == null)
                 {
                     clientServices.Add(siteName, null);
 
-                    eventLogService.LogWarning("AmazonPersonalize", "MISSINGCREDENTIALS", $"Live site app settings do not contain Amazon Personalize access key or secret key for site '{siteName}'.");
+                    eventLogService.LogWarning("AmazonPersonalize", "MISSINGCREDENTIALS", $"Live site app settings do not contain Amazon Personalize access key, secret key or endpoint for site '{siteName}'.");
 
                     return null;
                 }
-                
-                var amazonClient = new AmazonPersonalizeEventsClient(accessKey, secretKey, Amazon.RegionEndpoint.EUCentral1);
 
-                var clientService = new EventClientService(amazonClient, siteName, configurationProvider, eventLogService);
+                var regionEndpoint = Amazon.RegionEndpoint.GetBySystemName(regionEndpointName);
+                var amazonClient = new AmazonPersonalizeEventsClient(accessKey, secretKey, regionEndpoint);
+                
+                var eventTrackerService = eventTrackerServiceProvider.Get(siteName);
+
+                var clientService = new EventClientService(amazonClient, eventLogService, eventTrackerService);
 
                 clientServices.Add(siteName, clientService);
 

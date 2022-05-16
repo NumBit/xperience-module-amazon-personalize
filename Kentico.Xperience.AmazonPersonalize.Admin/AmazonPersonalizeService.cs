@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using CMS.Core;
@@ -6,37 +7,30 @@ using CMS.DocumentEngine;
 
 namespace Kentico.Xperience.AmazonPersonalize.Admin
 {
+    /// <summary>
+    /// Manages pages in the corresponding site's Amazon Personalize Amazon Personalize.
+    /// </summary>
     public class AmazonPersonalizeService : IAmazonPersonalizeService
     {
-        private readonly IDatasetClientServiceProvider datasetClientServiceProvider;
         private readonly IItemClientServiceProvider itemClientServiceProvider;
         private readonly IFieldMapper fieldMapper;
         private readonly IEventLogService eventLogService;
 
-        public AmazonPersonalizeService(IDatasetClientServiceProvider clientServiceProvider, IFieldMapper fieldMapper, IEventLogService eventLogService, IItemClientServiceProvider itemClientServiceProvider)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AmazonPersonalizeService"/> class.
+        /// </summary>
+        /// <param name="itemClientServiceProvider">Provider of <see cref="ItemClientService"/>s.</param>
+        /// <param name="fieldMapper">Mapper for page fields.</param>
+        /// <param name="eventLogService">Event log service.</param>
+        public AmazonPersonalizeService(IFieldMapper fieldMapper, IEventLogService eventLogService, IItemClientServiceProvider itemClientServiceProvider)
         {
-            this.datasetClientServiceProvider = clientServiceProvider;
-            this.fieldMapper = fieldMapper;
-            this.eventLogService = eventLogService;
-            this.itemClientServiceProvider = itemClientServiceProvider;
+            this.fieldMapper = fieldMapper ?? throw new ArgumentNullException(nameof(fieldMapper));
+            this.eventLogService = eventLogService ?? throw new ArgumentNullException(nameof(eventLogService));
+            this.itemClientServiceProvider = itemClientServiceProvider ?? throw new ArgumentNullException(nameof(itemClientServiceProvider));
         }
 
 
-        public void Init(string siteName)
-        {
-            LogNoClientWarning(siteName);
-            if (!datasetClientServiceProvider.IsAvailable(siteName))
-            {
-                LogNoClientWarning(siteName);
-                return;
-            }
-
-            var datasetService = datasetClientServiceProvider.Get(siteName);
-
-            datasetService.Init();
-        }
-
-
+        /// <inheritdoc/>
         public bool IsProcessed(TreeNode page)
         {
             var configuration = fieldMapper.GetConfigurations(page.NodeSiteName);
@@ -45,23 +39,22 @@ namespace Kentico.Xperience.AmazonPersonalize.Admin
         }
 
 
+        /// <summary>
+        /// Gets a value indicating whether <paramref name="page"/> in its current state is to be published to the Amazon Personalize dataset.
+        /// Non-published pages are deleted from the Amazon Personalize dataset.
+        /// </summary>
+        /// <param name="page">Page for which to return the publishing status.</param>
+        /// <returns>Returns true if the page should be sent to the Amazon Personalize dataset. Otherwise returns false.</returns>
+        /// <remarks>
+        /// The implementation decides the publishing state based on the <see cref="TreeNode.IsPublished"/> property.
+        /// </remarks>
         protected virtual bool IsPublished(TreeNode page)
         {
             return page.IsPublished;
         }
 
 
-        public void Reset(string siteName)
-        {
-            if (!datasetClientServiceProvider.IsAvailable(siteName))
-            {
-                LogNoClientWarning(siteName);
-                return;
-            }
-
-            datasetClientServiceProvider.Get(siteName).Reset();
-        }
-
+        /// <inheritdoc/>
         public void Send(TreeNode page)
         {
             var siteName = page.NodeSiteName;
@@ -75,6 +68,7 @@ namespace Kentico.Xperience.AmazonPersonalize.Admin
         }
 
 
+        /// <inheritdoc/>
         public void SendAll(string siteName)
         {
             if (!itemClientServiceProvider.IsAvailable(siteName))
@@ -86,21 +80,34 @@ namespace Kentico.Xperience.AmazonPersonalize.Admin
             var pageTypesMappings = fieldMapper.GetConfigurations(siteName);
             foreach (var pageType in pageTypesMappings.Mappings.Keys)
             {
-                eventLogService.LogInformation("AmazonPersonalize", "Sending page type", $"Sending pages of page type {pageType}");
                 SendPageType(pageType, siteName, pageTypesMappings.IncludedCultures);
             }
         }
 
 
+        /// <inheritdoc/>
+        public void Delete(TreeNode page)
+        {
+            var siteName = page.NodeSiteName;
+            if (!itemClientServiceProvider.IsAvailable(siteName))
+            {
+                LogNoClientWarning(siteName);
+                return;
+            }
+
+            itemClientServiceProvider.Get(siteName).DeleteItem(page);
+        }
+
+
         /// <summary>
-        /// Sends all pages of <paramref name="pageType"/> on the specified site to the Amazon Personalize database.
+        /// Sends all pages of <paramref name="pageType"/> on the specified site to the Amazon Personalize dataset.
         /// </summary>
-        /// <param name="pageType">Page type of pages to be sent to the database.</param>
+        /// <param name="pageType">Page type of pages to be sent to the dataset.</param>
         /// <param name="siteName">Name of site whose pages are to be sent.</param>
         /// <param name="includedCultures">Culture of pages to be sent. All cultures are sent if the set is empty.</param>
         /// <remarks>
         /// <para>
-        /// Only published versions of pages in included cultures are sent to the Amazon Personalize database.
+        /// Only published versions of pages in included cultures are sent to the Amazon Personalize dataset.
         /// </para>
         /// <para>
         /// When overriding, the method's implementation must be consistent with the <see cref="IsProcessed(TreeNode)"/> and <see cref="IsPublished(TreeNode)"/> methods.
@@ -128,7 +135,7 @@ namespace Kentico.Xperience.AmazonPersonalize.Admin
         /// <returns>Returns an enumeration of pages.</returns>
         /// <remarks>
         /// <para>
-        /// Only published versions of pages in included cultures are sent to the Amazon Personalize database.
+        /// Only published versions of pages in included cultures are sent to the Amazon Personalize dataset.
         /// </para>
         /// <para>
         /// When overriding, the method's implementation must be consistent with the <see cref="IsProcessed(TreeNode)"/> and <see cref="IsPublished(TreeNode)"/> methods.
@@ -153,6 +160,7 @@ namespace Kentico.Xperience.AmazonPersonalize.Admin
         }
 
 
+        /// <inheritdoc/>
         public virtual void PageCreated(TreeNode page)
         {
             if (!IsProcessed(page) || !IsPublished(page))
@@ -164,12 +172,7 @@ namespace Kentico.Xperience.AmazonPersonalize.Admin
         }
 
 
-        /// <summary>
-        /// Handles the event of page update. If the <paramref name="page"/> matches the <see cref="IsProcessed(TreeNode)"/> predicate,
-        /// it is either sent to the Amazon Personalize DB (if <see cref="IsPublished(TreeNode)"/> is true), or deleted from the Amazon Personalize DB.
-        /// </summary>
-        /// <param name="page">Page which was updated.</param>
-        /// <seealso cref="DocumentEvents.Update"/>
+        /// <inheritdoc/>
         public virtual void PageUpdated(TreeNode page)
         {
             if (!IsProcessed(page))
@@ -188,6 +191,7 @@ namespace Kentico.Xperience.AmazonPersonalize.Admin
         }
 
 
+        /// <inheritdoc/>
         public virtual void PageDeleted(TreeNode page)
         {
             if (!IsProcessed(page))
@@ -196,19 +200,6 @@ namespace Kentico.Xperience.AmazonPersonalize.Admin
             }
 
             Delete(page);
-        }
-
-
-        public void Delete(TreeNode page)
-        {
-            var siteName = page.NodeSiteName;
-            if (!itemClientServiceProvider.IsAvailable(siteName))
-            {
-                LogNoClientWarning(siteName);
-                return;
-            }
-
-            itemClientServiceProvider.Get(siteName).DeleteItem(page);
         }
     }
 }

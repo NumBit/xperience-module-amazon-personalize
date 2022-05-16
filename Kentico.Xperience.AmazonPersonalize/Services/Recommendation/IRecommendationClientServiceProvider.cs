@@ -15,7 +15,7 @@ namespace Kentico.Xperience.AmazonPersonalize
         /// Gets a value indicating whether the Amazon Personalize recommendation client service is available for the specified site.
         /// </summary>
         /// <param name="siteName">Name of site for which to test the availability.</param>
-        /// <returns>Returns true if the client service is available for <paramref name="siteName"/>, otherwise returns false.</returns>
+        /// <returns>Returns true if the recommendation client service is available for <paramref name="siteName"/>, otherwise returns false.</returns>
         bool IsAvailable(string siteName);
 
 
@@ -23,7 +23,7 @@ namespace Kentico.Xperience.AmazonPersonalize
         /// Gets the Amazon Personalize recommendation client services for the specified site.
         /// </summary>
         /// <param name="siteName">Name of site for which to return the client service.</param>
-        /// <returns>Returns the client service, or null if client service is not available for the site.</returns>
+        /// <returns>Returns the recommendation client service, or null if recommendation client service is not available for the site.</returns>
         IRecommendationClientService Get(string siteName);
     }
 }

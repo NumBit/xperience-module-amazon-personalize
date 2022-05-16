@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using Amazon.Personalize;
+
 using Amazon.PersonalizeEvents;
-using Amazon.Runtime;
+
 using CMS.Core;
 
 namespace Kentico.Xperience.AmazonPersonalize.Admin
 {
+
     /// <summary>
-    /// Provider of site-specific <see cref="IDatasetClientService"/>.
+    /// Provider of site-specific <see cref="IItemClientServiceProvider"/>.
     /// </summary>
     public class ItemClientServiceProvider : IItemClientServiceProvider
     {
@@ -23,7 +24,7 @@ namespace Kentico.Xperience.AmazonPersonalize.Admin
 
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DatasetClientServiceProvider"/> class.
+        /// Initializes a new instance of the <see cref="ItemClientServiceProvider"/> class.
         /// </summary>
         /// <param name="serviceConfigurationProvider">Provider of the Amazon Personalize item service configuration.</param>
         /// <param name="eventLogService">Event log service.</param>
@@ -31,27 +32,19 @@ namespace Kentico.Xperience.AmazonPersonalize.Admin
         {
             this.serviceConfigurationProvider = serviceConfigurationProvider ?? throw new ArgumentNullException(nameof(serviceConfigurationProvider));
             this.eventLogService = eventLogService ?? throw new ArgumentNullException(nameof(eventLogService));
-            this.configProvider = configProvider;
-            this.fieldMapper = fieldMapper;
+            this.configProvider = configProvider ?? throw new ArgumentNullException(nameof(configProvider));
+            this.fieldMapper = fieldMapper ?? throw new ArgumentNullException(nameof(fieldMapper));
         }
 
 
-        /// <summary>
-        /// Gets a value indicating whether the Amazon Personalize item client service is available for the specified site.
-        /// </summary>
-        /// <param name="siteName">Name of site for which to test the availability.</param>
-        /// <returns>Returns true if the client service is available for <paramref name="siteName"/>, otherwise returns false.</returns>
+        /// <inheritdoc/>
         public bool IsAvailable(string siteName)
         {
             return Get(siteName) != null;
         }
 
 
-        /// <summary>
-        /// Gets the Amazon Personalize item client services for the specified site.
-        /// </summary>
-        /// <param name="siteName">Name of site for which to return the client service.</param>
-        /// <returns>Returns the client service, or null if client service is not available for the site.</returns>
+        /// <inheritdoc/>
         public IItemClientService Get(string siteName)
         {
             if (clientServices.TryGetValue(siteName, out var cs))
@@ -69,16 +62,19 @@ namespace Kentico.Xperience.AmazonPersonalize.Admin
 
                 var accessKey = serviceConfigurationProvider.GetAcessKey(siteName);
                 var secretKey = serviceConfigurationProvider.GetSecretKey(siteName);
-                if (String.IsNullOrEmpty(accessKey) || String.IsNullOrEmpty(secretKey))
+                var regionEndpointName = configProvider.GetRegionEndpoint(siteName);
+                if (String.IsNullOrEmpty(accessKey) || String.IsNullOrEmpty(secretKey) || regionEndpointName == null)
+
                 {
                     clientServices.Add(siteName, null);
 
-                    eventLogService.LogWarning("AmazonPersonalize", "MISSINGCREDENTIALS", $"Live site app settings do not contain Amazon Personalize access key or secret key for site '{siteName}'.");
+                    eventLogService.LogWarning("AmazonPersonalize", "MISSINGCREDENTIALS", $"App settings do not contain Amazon Personalize access key, secret key or endpoint region for site '{siteName}'.");
 
                     return null;
                 }
-                
-                var amazonClient = new AmazonPersonalizeEventsClient(accessKey, secretKey, Amazon.RegionEndpoint.EUCentral1);
+
+                var regionEndpoint = Amazon.RegionEndpoint.GetBySystemName(regionEndpointName);
+                var amazonClient = new AmazonPersonalizeEventsClient(accessKey, secretKey, regionEndpoint);
 
                 var clientService = new ItemClientService(amazonClient, siteName, configProvider, fieldMapper, eventLogService);
 

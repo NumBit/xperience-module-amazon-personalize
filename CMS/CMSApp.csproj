@@ -14477,10 +14477,6 @@
       <Project>{8d1a4ecc-04a4-4112-8c08-dc03a4c158dd}</Project>
       <Name>Kentico.Xperience.AmazonPersonalize.Admin.SampleConfiguration</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Kentico.Xperience.AmazonPersonalize.Admin\Kentico.Xperience.AmazonPersonalize.Admin.csproj">
-      <Project>{9cb4d74c-2766-4a42-af5c-f2822b9593fd}</Project>
-      <Name>Kentico.Xperience.AmazonPersonalize.Admin</Name>
-    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

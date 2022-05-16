@@ -1,11 +1,16 @@
 ﻿using System;
+using System.Collections;
 using System.Linq;
+
+using CMS.ContactManagement;
+using CMS.DocumentEngine;
 
 using DancingGoat.Models;
 using DancingGoat.Widgets;
 
 using Kentico.Content.Web.Mvc;
 using Kentico.PageBuilder.Web.Mvc;
+using Kentico.Xperience.AmazonPersonalize;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewComponents;
@@ -29,6 +34,8 @@ namespace DancingGoat.Widgets
         private readonly ArticleRepository repository;
         private readonly IPageUrlRetriever pageUrlRetriever;
         private readonly IPageAttachmentUrlRetriever attachmentUrlRetriever;
+        private readonly IAmazonPersonalizeService amazonPersonalizeService;
+        private readonly IPageDataContextRetriever pageDataContextRetriever;
 
 
         /// <summary>
@@ -36,11 +43,13 @@ namespace DancingGoat.Widgets
         /// </summary>
         /// <param name="repository">Article repository.</param>
         /// <param name="pageUrlRetriever">Retriever for page URLs.</param>
-        public ArticlesWidgetViewComponent(ArticleRepository repository, IPageUrlRetriever pageUrlRetriever, IPageAttachmentUrlRetriever attachmentUrlRetriever)
+        public ArticlesWidgetViewComponent(ArticleRepository repository, IPageUrlRetriever pageUrlRetriever, IPageAttachmentUrlRetriever attachmentUrlRetriever, IAmazonPersonalizeService amazonPersonalizeService, IPageDataContextRetriever pageDataContextRetriever)
         {
             this.repository = repository;
             this.pageUrlRetriever = pageUrlRetriever;
             this.attachmentUrlRetriever = attachmentUrlRetriever;
+            this.amazonPersonalizeService = amazonPersonalizeService;
+            this.pageDataContextRetriever = pageDataContextRetriever;
         }
 
 
@@ -57,8 +66,12 @@ namespace DancingGoat.Widgets
 
             viewModel.CacheDependencies.CacheKeys = dependency_keys;
 
-            var articles = repository.GetArticles(ContentItemIdentifiers.ARTICLES, viewModel.Properties.Count);
-            var articlesModel = articles.Select(article => ArticleViewModel.GetViewModel(article, pageUrlRetriever, attachmentUrlRetriever));
+            var page = pageDataContextRetriever.Retrieve<TreeNode>().Page;
+            var contactGuid = ContactManagementContext.GetCurrentContact()?.ContactGUID ?? Guid.Empty;
+            var recommendedPages = amazonPersonalizeService.GetPagesRecommendationForContact(page.NodeSiteName, contactGuid, viewModel.Properties.Count, page.DocumentCulture, new string[] { "cms.document.dancinggoatcore.article" });
+
+            var articles = repository.GetArticles(recommendedPages?.Select(page => page.NodeGuid));
+            var articlesModel = articles?.Select(article => ArticleViewModel.GetViewModel(article, pageUrlRetriever, attachmentUrlRetriever)) ?? Enumerable.Empty<ArticleViewModel>();
             return View("~/Components/Widgets/Articles/_ArticlesWidget.cshtml", new ArticlesWidgetViewModel { Articles = articlesModel, Count = viewModel.Properties.Count });
         }
     }

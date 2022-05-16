@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using CMS.DocumentEngine;
@@ -44,6 +45,19 @@ namespace DancingGoat.Models
                     .Key($"{nameof(ArticleRepository)}|{nameof(GetArticles)}|{nodeAliasPath}|{count}")
                     // Include path dependency to flush cache when a new child page is created.
                     .Dependencies((_, builder) => builder.PagePath(nodeAliasPath, PathTypeEnum.Children)));
+        }
+
+        public IEnumerable<Article> GetArticles(IEnumerable<Guid> nodeGuids)
+        {
+            var nodeGuidsList = nodeGuids.ToList();
+
+            return pageRetriever.Retrieve<Article>(
+                query => query
+                    .WhereIn("NodeGuid", nodeGuidsList)
+                    .OrderByDescending("DocumentPublishFrom"),
+                cache => cache
+                    .Key($"{nameof(ArticleRepository)}|{nameof(GetArticles)}|{String.Join(":", nodeGuidsList.OrderBy(g => g))}")
+                );
         }
 
 

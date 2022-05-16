@@ -40,7 +40,14 @@ namespace Kentico.Xperience.AmazonPersonalize.Admin.SampleConfiguration
             {
                 new FieldMapping("ArticleTitle", "Title"),
                 new FieldMapping("ArticleSummary", "Summary"),
-                new FieldMapping(article => article.GetValue("ArticleText").ToString(), "Text")
+                //new FieldMapping(article => article.GetValue("ArticleText").ToString(), "Text")
+            });
+
+            configurations.Mappings.Add("cms.document.DancingGoatCore.Coffee", new List<FieldMapping>
+            {
+                new FieldMapping("DocumentName", "Title"),
+                new FieldMapping("DocumentSKUShortDescription", "Summary"),
+                //new FieldMapping(article => article.GetValue("ArticleText").ToString(), "Text")
             });
         }
     }

@@ -7,7 +7,7 @@ using CMS.DocumentEngine;
 namespace Kentico.Xperience.AmazonPersonalize.Admin
 {
     /// <summary>
-    /// Performs mapping of page type fields to Amazon Personalize database item properties.
+    /// Performs mapping of page type fields to Amazon Personalize dataset item properties.
     /// </summary>
     public class FieldMapper : IFieldMapper
     {
@@ -60,10 +60,10 @@ namespace Kentico.Xperience.AmazonPersonalize.Admin
 
 
         /// <summary>
-        /// Maps a page to Amazon Personalize database item.
+        /// Maps a page to Amazon Personalize dataset item.
         /// </summary>
         /// <param name="page">Page to be mapped.</param>
-        /// <returns>Returns the mapped Amazon Personalize database item.</returns>
+        /// <returns>Returns the mapped Amazon Personalize dataset item.</returns>
         /// <exception cref="InvalidOperationException">Thrown when the page's site does not contain the configuration for page's type.</exception>
         public Dictionary<string, string> Map(TreeNode page)
         {
@@ -105,14 +105,14 @@ namespace Kentico.Xperience.AmazonPersonalize.Admin
         /// </summary>
         /// <param name="fieldMapping">Descriptor of the field mapping.</param>
         /// <param name="page">Page to be mapped.</param>
-        /// <returns>Returns the value to be mapped to the Amazon Personalize DB.</returns>
+        /// <returns>Returns the value to be mapped to the Amazon Personalize dataset.</returns>
         protected virtual string GetMappedValue(FieldMapping fieldMapping, TreeNode page)
         {
             if (fieldMapping.SourceValue != null)
             {
                 return fieldMapping.SourceValue(page);
             }
-            return page.GetValue(fieldMapping.SourceName).ToString();
+            return page.GetValue(fieldMapping.SourceName).ToString().Replace("\n", "").Replace("\r", "");
         }
 
 
@@ -120,7 +120,7 @@ namespace Kentico.Xperience.AmazonPersonalize.Admin
         /// Maps system fields of <paramref name="page"/> to the resulting Amazon Personalize item.
         /// </summary>
         /// <param name="page">Page to be mapped.</param>
-        /// <param name="result">Amazon Personalize database item to map into.</param>
+        /// <param name="result">Amazon Personalize dataset item to map into.</param>
         /// <seealso cref="PAGE_TYPE_PROPERTY_NAME"/>
         /// <seealso cref="CULTURE_PROPERTY_NAME"/>
         /// <seealso cref="DELETED_PROPERTY_NAME"/>

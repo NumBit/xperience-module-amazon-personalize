@@ -4,12 +4,12 @@ using System.Collections.Generic;
 namespace Kentico.Xperience.AmazonPersonalize.Admin
 {
     /// <summary>
-    /// Represents configuration of individual page types and how they are mapped to the Amazon Personalize DB.
+    /// Represents configuration of individual page types and how they are mapped to the Amazon Personalize dataset.
     /// </summary>
     public class PageTypeMappings
     {
         /// <summary>
-        /// Gets the set of page cultures to be included in the Amazon Personalize DB.
+        /// Gets the set of page cultures to be included in the Amazon Personalize dataset.
         /// Empty set means that all cultures are included.
         /// </summary>
         /// <remarks>

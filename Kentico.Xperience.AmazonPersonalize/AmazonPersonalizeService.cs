@@ -5,7 +5,9 @@ using CMS.DocumentEngine;
 
 namespace Kentico.Xperience.AmazonPersonalize
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Manages content recommendation operations in the corresponding site's Amazon Personalize dataset.
+    /// </summary>
     public class AmazonPersonalizeService : IAmazonPersonalizeService
     {
         private readonly IRecommendationClientServiceProvider recommendationClientServiceProvider;
@@ -20,17 +22,16 @@ namespace Kentico.Xperience.AmazonPersonalize
         public AmazonPersonalizeService(IRecommendationClientServiceProvider recommendationClientServiceProvider, IEventClientServiceProvider eventClientServiceProvider)
         {
             this.recommendationClientServiceProvider = recommendationClientServiceProvider ?? throw new ArgumentNullException(nameof(recommendationClientServiceProvider));
-            this.eventClientServiceProvider = eventClientServiceProvider;
+            this.eventClientServiceProvider = eventClientServiceProvider ?? throw new ArgumentNullException(nameof(eventClientServiceProvider));
         }
 
 
         /// <inheritdoc/>
         public IEnumerable<PageIdentifier> GetPagesRecommendationForContact(string siteName, Guid contactGuid, int count, string culture, IEnumerable<string> pageTypes = null)
         {
-            var client = GetClientServiceOrThrow(siteName);
-
+            var client = GetRecommendationClientServiceOrThrow(siteName);
             
-            var recommendation = client.GetRecommendations(siteName, contactGuid, count, culture, pageTypes);
+            var recommendation = client.GetRecommendationsForContact(siteName, contactGuid, count, culture, pageTypes);
 
             return recommendation;
         }
@@ -39,7 +40,7 @@ namespace Kentico.Xperience.AmazonPersonalize
         /// <inheritdoc/>
         public IEnumerable<PageIdentifier> GetPagesRecommendationForPage(TreeNode page, string siteName, int count, string culture, IEnumerable<string> pageTypes = null)
         {
-            var client = GetClientServiceOrThrow(siteName);
+            var client = GetRecommendationClientServiceOrThrow(siteName);
 
 
             var recommendation = client.GetPagesRecommendationForPage(page, siteName, count, culture, pageTypes);
@@ -49,7 +50,7 @@ namespace Kentico.Xperience.AmazonPersonalize
 
 
         /// <inheritdoc/>
-        public void LogPageView(TreeNode page, Guid contactGuid, string sessionId, List<TreeNode> impression = null)
+        public void LogPageView(TreeNode page, Guid contactGuid, string sessionId = null, List<TreeNode> impression = null)
         {
             var client = GetEventClientServiceOrThrow(page.NodeSiteName);
 
@@ -57,7 +58,7 @@ namespace Kentico.Xperience.AmazonPersonalize
         }
 
 
-        private IRecommendationClientService GetClientServiceOrThrow(string siteName)
+        private IRecommendationClientService GetRecommendationClientServiceOrThrow(string siteName)
         {
             return recommendationClientServiceProvider.Get(siteName) ?? throw new InvalidOperationException($"The Amazon Personalize recommendation client service is not available on site '{siteName}'. Specify the Amazon acess key and secret key in the application configuration file.");
         }

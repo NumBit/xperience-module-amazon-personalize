@@ -31,13 +31,13 @@ namespace DancingGoat.PageTemplates
         public string ArticleWidth { get; set; }
 
 
-        public static ArticleWithSideBarViewModel GetViewModel(Article article, ArticleWithSideBarProperties templateProperties, IPageUrlRetriever pageUrlRetriever, IPageAttachmentUrlRetriever attachmentUrlRetriever)
+        public static ArticleWithSideBarViewModel GetViewModel(Article article, ArticleWithSideBarProperties templateProperties, IPageUrlRetriever pageUrlRetriever, IPageAttachmentUrlRetriever attachmentUrlRetriever, IEnumerable<Article> recommendedArticles)
         {
             return new ArticleWithSideBarViewModel
             {
                 TeaserPath = article.Fields.Teaser == null ? null : attachmentUrlRetriever.Retrieve(article.Fields.Teaser).RelativePath,
                 PublicationDate = article.PublicationDate,
-                RelatedArticles = article.Fields.RelatedArticles.OfType<Article>().Select(relatedArticle => RelatedArticleViewModel.GetViewModel(relatedArticle, false, pageUrlRetriever, attachmentUrlRetriever)),
+                RelatedArticles = recommendedArticles?.Select(relatedArticle => RelatedArticleViewModel.GetViewModel(relatedArticle, false, pageUrlRetriever, attachmentUrlRetriever)) ?? Enumerable.Empty<RelatedArticleViewModel>(),
                 Text = article.Fields.Text,
                 Title = article.Fields.Title,
                 SidebarLocation = (ArticleSidebarLocationEnum)Enum.Parse(typeof(ArticleSidebarLocationEnum), templateProperties.SidebarLocation, true),

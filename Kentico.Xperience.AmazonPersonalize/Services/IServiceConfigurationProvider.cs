@@ -7,7 +7,7 @@ using Kentico.Xperience.AmazonPersonalize;
 namespace Kentico.Xperience.AmazonPersonalize
 {
     /// <summary>
-    /// Provides configuration of the Amazon Personalize service.
+    /// Provides configuration of the Amazon Personalize services.
     /// </summary>
     public interface IServiceConfigurationProvider
     {
@@ -43,7 +43,6 @@ namespace Kentico.Xperience.AmazonPersonalize
         string GetSimmilarItemsCampaignArn(string siteName);
 
 
-
         /// <summary>
         /// Gets the Amazon Personalize dataset group arn.
         /// </summary>
@@ -75,5 +74,12 @@ namespace Kentico.Xperience.AmazonPersonalize
         /// <returns>Returns the event tracker arn for <paramref name="siteName"/>, or null if not configured.</returns>
         string GetEventTrackerArn(string siteName);
 
+
+        /// <summary>
+        /// Gets the Amazon Personalize region endpoint.
+        /// </summary>
+        /// <param name="siteName">Name of site for which to return the region endpoint.</param>
+        /// <returns>Returns the region endpoint for <paramref name="siteName"/>, or null if not configured.</returns>
+        string GetRegionEndpoint(string siteName);
     }
 }

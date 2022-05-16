@@ -11,6 +11,9 @@ using Newtonsoft.Json;
 
 namespace Kentico.Xperience.AmazonPersonalize.Admin
 {
+    /// <summary>
+    /// Manages pages in the corresponding site's Amazon Personalize dataset.
+    /// </summary>
     public class ItemClientService : IItemClientService
     {
         private readonly AmazonPersonalizeEventsClient amazonClient;
@@ -21,9 +24,14 @@ namespace Kentico.Xperience.AmazonPersonalize.Admin
 
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DatasetClientService"/> class.
+        /// Initializes a new instance of the <see cref="ItemClientService"/> class.
         /// </summary>
         /// <param name="amazonClient">Amazon Personalize client to be managed.</param>
+        /// <param name="siteName">Name of site the Amazon Personalize client belongs to.</param>
+        /// <param name="configProvider">Provider of the Amazon Personalize services configuration.</param>
+        /// <param name="fieldMapper">Mapper for page fields.</param>
+        /// <param name="eventLogService">Event log service.</param>
+        /// <exception cref="ArgumentNullException"></exception>
         public ItemClientService(AmazonPersonalizeEventsClient amazonClient, string siteName, IServiceConfigurationProvider configProvider, IFieldMapper fieldMapper, IEventLogService eventLogService)
         {
             this.amazonClient = amazonClient ?? throw new ArgumentNullException(nameof(amazonClient));
@@ -34,6 +42,7 @@ namespace Kentico.Xperience.AmazonPersonalize.Admin
         }
 
 
+        /// <inheritdoc/>
         public void PutItem(TreeNode page)
         {
             var itemValues = fieldMapper.Map(page);
@@ -42,6 +51,7 @@ namespace Kentico.Xperience.AmazonPersonalize.Admin
         }
 
 
+        /// <inheritdoc/>
         public void DeleteItem(TreeNode page)
         {
             var itemValues = fieldMapper.Map(page);
@@ -50,6 +60,7 @@ namespace Kentico.Xperience.AmazonPersonalize.Admin
             
             ProcessItem(page, itemValues);
         }
+
 
         private void ProcessItem(TreeNode page, Dictionary<string, string> itemValues)
         {
@@ -68,7 +79,6 @@ namespace Kentico.Xperience.AmazonPersonalize.Admin
 
             try
             {
-                eventLogService.LogInformation("AmazonPersonalize", "Processing item", $"Processing page {page.DocumentName}");
                 amazonClient.PutItemsAsync(request).Wait();
             }
             catch (Exception ex)
@@ -79,6 +89,15 @@ namespace Kentico.Xperience.AmazonPersonalize.Admin
             }
         }
 
+
+        /// <summary>
+        /// Gets Amazon PErsonalize dataset item identifier for <paramref name="page"/>.
+        /// </summary>
+        /// <param name="page">Page for which to return an identifier.</param>
+        /// <returns>Returns the page's identifier.</returns>
+        /// <remarks>
+        /// The method returns identifier in format '&lt;NodeGUID&gt;:&lt;DocumentGUID&gt;'.
+        /// </remarks>
         protected virtual string GetItemId(TreeNode page)
         {
             return $"{page.NodeGUID}:{page.DocumentGUID}";

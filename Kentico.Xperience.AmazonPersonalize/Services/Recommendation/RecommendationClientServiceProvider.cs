@@ -31,22 +31,14 @@ namespace Kentico.Xperience.AmazonPersonalize
         }
 
 
-        /// <summary>
-        /// Gets a value indicating whether the Amazon Personalize recommendation client service is available for the specified site.
-        /// </summary>
-        /// <param name="siteName">Name of site for which to test the availability.</param>
-        /// <returns>Returns true if the client service is available for <paramref name="siteName"/>, otherwise returns false.</returns>
+        /// <inheritdoc/>
         public bool IsAvailable(string siteName)
         {
             return Get(siteName) != null;
         }
 
 
-        /// <summary>
-        /// Gets the Amazon Personalize recommendation client services for the specified site.
-        /// </summary>
-        /// <param name="siteName">Name of site for which to return the client service.</param>
-        /// <returns>Returns the client service, or null if client service is not available for the site.</returns>
+        /// <inheritdoc/>
         public IRecommendationClientService Get(string siteName)
         {
             if (clientServices.TryGetValue(siteName, out var cs))
@@ -61,21 +53,22 @@ namespace Kentico.Xperience.AmazonPersonalize
                     return cs2;
                 }
 
-
                 var accessKey = configurationProvider.GetAcessKey(siteName);
                 var secretKey = configurationProvider.GetSecretKey(siteName);
-                if (String.IsNullOrEmpty(accessKey) || String.IsNullOrEmpty(secretKey))
+                var regionEndpointName = configurationProvider.GetRegionEndpoint(siteName);
+                if (String.IsNullOrEmpty(accessKey) || String.IsNullOrEmpty(secretKey) || regionEndpointName == null)
                 {
                     clientServices.Add(siteName, null);
 
-                    eventLogService.LogWarning("AmazonPersonalize", "MISSINGCREDENTIALS", $"Live site app settings do not contain Amazon Personalize access key or secret key for site '{siteName}'.");
+                    eventLogService.LogWarning("AmazonPersonalize", "MISSINGCREDENTIALS", $"Live site app settings do not contain Amazon Personalize access key, secret key or endpoint name for site '{siteName}'.");
 
                     return null;
                 }
 
-                var amazonClient = new AmazonPersonalizeRuntimeClient(accessKey, secretKey, Amazon.RegionEndpoint.EUCentral1);
+                var regionEndpoint = Amazon.RegionEndpoint.GetBySystemName(regionEndpointName);
+                var amazonClient = new AmazonPersonalizeRuntimeClient(accessKey, secretKey, regionEndpoint);
 
-                var clientService = new RecommendationClientService(amazonClient, configurationProvider);
+                var clientService = new RecommendationClientService(amazonClient, configurationProvider, eventLogService);
 
                 clientServices.Add(siteName, clientService);
 

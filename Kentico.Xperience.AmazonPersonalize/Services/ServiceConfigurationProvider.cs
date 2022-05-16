@@ -1,6 +1,5 @@
 ﻿using System;
 
-using CMS.Base;
 using CMS.Core;
 
 namespace Kentico.Xperience.AmazonPersonalize
@@ -16,6 +15,7 @@ namespace Kentico.Xperience.AmazonPersonalize
         private const string FILTER_WITH_PAGE_TYPES_ARN = "AmazonPersonalize.ContentRecommendation.FilterWithPageTypesArn";
         private const string FILTER_WITHOUT_PAGE_TYPES_ARN = "AmazonPersonalize.ContentRecommendation.FilterWithoutPageTypesArn";
         private const string EVENT_TRACKER_ARN = "AmazonPersonalize.ContentRecommendation.EventTrackerArn";
+        private const string REGION_ENDPOINT = "AmazonPersonalize.ContentRecommendation.RegionEndpoint";
 
         private readonly IAppSettingsService appSettingsService;
 
@@ -24,7 +24,7 @@ namespace Kentico.Xperience.AmazonPersonalize
         /// Initializes a new instance of the <see cref="ServiceConfigurationProvider"/> class.
         /// </summary>
         /// <param name="appSettingsService">Application settings service.</param>
-        public ServiceConfigurationProvider(IAppSettingsService appSettingsService, ISiteService siteService)
+        public ServiceConfigurationProvider(IAppSettingsService appSettingsService)
         {
             this.appSettingsService = appSettingsService ?? throw new ArgumentNullException(nameof(appSettingsService));
         }
@@ -47,6 +47,7 @@ namespace Kentico.Xperience.AmazonPersonalize
         }
 
 
+        /// <inheritdoc/>
         public string GetPersonalizedCampaignArn(string siteName)
         {
             var keyName = $"{siteName}.{PERSONALIZED_CAMPAIGN_ARN}";
@@ -54,6 +55,8 @@ namespace Kentico.Xperience.AmazonPersonalize
             return appSettingsService[keyName];
         }
 
+
+        /// <inheritdoc/>
         public string GetSimmilarItemsCampaignArn(string siteName)
         {
             var keyName = $"{siteName}.{SIMMILAR_ITEMS_CAMPAIGN_ARN}";
@@ -93,6 +96,15 @@ namespace Kentico.Xperience.AmazonPersonalize
         public string GetEventTrackerArn(string siteName)
         {
             var keyName = $"{siteName}.{EVENT_TRACKER_ARN}";
+
+            return appSettingsService[keyName];
+        }
+
+
+        /// <inheritdoc/>
+        public string GetRegionEndpoint(string siteName)
+        {
+            var keyName = $"{siteName}.{REGION_ENDPOINT}";
 
             return appSettingsService[keyName];
         }

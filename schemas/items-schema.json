@@ -1,0 +1,53 @@
+{
+	"type": "record",
+	"name": "Items",
+	"namespace": "com.amazonaws.personalize.schema",
+	"fields": [
+		{
+			"name": "ITEM_ID",
+			"type": "string"
+		},
+		{
+			"name": "DELETED",
+			"type": "string"
+		},
+		{
+			"name": "TITLE",
+			"type": [
+				"string",
+				"null"
+			]
+		},
+		{
+			"name": "SUMMARY",
+			"type": [
+				"string",
+				"null"
+			]
+		},
+		{
+			"name": "TEXT",
+			"type": [
+				"string",
+				"null"
+			]
+		},
+		{
+			"name": "CULTURE",
+			"type": [
+				"string",
+				"null"
+			],
+			"categorical": true
+		},
+		{
+			"name": "PAGE_TYPE",
+			"type": [
+				"string",
+				"null"
+			],
+			"categorical": true
+		}
+	],
+	"version": "1.0"
+}

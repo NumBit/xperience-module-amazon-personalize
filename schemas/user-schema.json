@@ -1,0 +1,19 @@
+{
+	"type": "record",
+	"name": "Users",
+	"namespace": "com.amazonaws.personalize.schema",
+	"fields": [
+		{
+			"name": "USER_ID",
+			"type": "string"
+		},
+		{
+			"name": "AGE",
+			"type": [
+				"null",
+				"int"
+			]
+		}
+	],
+	"version": "1.0"
+}

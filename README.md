@@ -2,6 +2,7 @@
 # Kentico Xperience Amazon Personalize Modules
 
 This repository contains the source for modules that integrate  Kentico Xperience with Amazon Personalize recommender system.
+This module is based on the [recombee module](https://github.com/Kentico/xperience-module-recombee) for compatibility and easy interchangeability.
 
 ## Description
 
